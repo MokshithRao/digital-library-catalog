@@ -7,14 +7,14 @@ from database import Base
 class Author(Base):
     __tablename__ = "authors"
 
-    id = Column(Integer, primary_key=Text)
+    id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     biography = Column(Text)
 
     books = relationship("Book", back_populates="author")
 
 
-class Gener(Base):
+class Genre(Base):
     __tablename__ = "genres"
 
     id = Column(Integer, primary_key=True)
@@ -32,7 +32,7 @@ class Book(Base):
     description = Column(Text)
     isbn = Column(String, unique=True)
     publisher = Column(String)
-    punlication_year = Column(Integer)
+    publication_year = Column(Integer)
     cover_image = Column(String)
     is_available = Column(Boolean, default=True)
 
@@ -40,5 +40,5 @@ class Book(Base):
     genre_id = Column(Integer, ForeignKey("genres.id"))
 
     author = relationship("Author", back_populates="books")
-    genre = relationship("Genre", back_populates="Books")
+    genre = relationship("Genre", back_populates="books")
 
