@@ -11,14 +11,27 @@ templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/")
-def list_books(request: Request, db: Session = Depends(get_db)):
-    books = db.query(Book).all()
+def list_books(
+    request: Request, 
+    search: str = None, 
+    db: Session = Depends(get_db)
+):
+    query = db.query(Book)
+
+    if search:
+        query = query.filter(Book.title.ilike(f"%{search}%"))
+
+    books = query.all()
 
     return templates.TemplateResponse(
         name="listing.html",
         request=request,
-        context={"books": books}
+        context={
+            "books": books,
+            "search": search
+        }
     )
+
 
 
 @router.get("/{book_id}")
@@ -40,3 +53,5 @@ def book_details(
         request=request,
         context={"book": book}
     )
+
+

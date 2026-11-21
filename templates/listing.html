@@ -5,6 +5,16 @@
 {% block content %}
 <h2>Our Book Collection</h2>
 
+<form action="/books" method="GET">
+    <input
+        type="text"
+        name="search"
+        placeholder="Search books by title..."
+        value="{{ search or '' }}"
+    >
+    <button type="submit">Search</button>
+</form>
+
 <div class="book-container">
     {% for book in books %}
         <div class="book-card">
@@ -22,7 +32,7 @@
             </a>
         </div>
     {% else %}
-        <p>No books available.</p>
+    <p>No books found. Try another search.</p>
     {% endfor %}
 </div>
 {% endblock %}
