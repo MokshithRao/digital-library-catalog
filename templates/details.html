@@ -14,13 +14,20 @@
     >
 
     <p><strong>Author:</strong> {{ book.author.name }}</p>
+    <p><strong>About the Author:</strong> {{ book.author.biography or "Biography not available." }}</p>
     <p><strong>Genre:</strong> {{ book.genre.name }}</p>
+    <p><strong>About the Genre:</strong> {{ book.genre.description or "Description not available." }}</p>
     <p><strong>Description:</strong> {{ book.description }}</p>
     <p><strong>ISBN:</strong> {{ book.isbn or "Not available" }}</p>
     <p><strong>Publisher:</strong> {{ book.publisher }}</p>
     <p><strong>Publication Year:</strong> {{ book.publication_year }}</p>
-    <p><strong>Availability:</strong>
-        {{ "Available" if book.is_available else "Unavailable" }}
+    <p>
+        <strong>Availability:</strong>
+        {% if book.is_available %}
+            Available for borrowing
+        {% else %}
+            Currently unavailable
+        {% endif %}
     </p>
 
     <a href="{{ next_url }}">Back</a>
