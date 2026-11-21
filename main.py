@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from routers.home import router as home_router
 from routers.books import router as books_router
 from routers.genres import router as genres_router
+from routers.auth import router as auth_router
 
 
 
@@ -24,5 +25,6 @@ app.mount(
 app.include_router(home_router)
 app.include_router(books_router, prefix="/books", tags=["Books"])
 app.include_router(genres_router, prefix="/genres", tags=["Genres"])
+app.include_router(auth_router, tags=["Authentication"])
 
 
