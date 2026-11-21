@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from dependencies import get_db
-from models import Book
+from models import Book, Genre
 
 router = APIRouter()
 
@@ -13,7 +13,8 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/")
 def list_books(
     request: Request, 
-    search: str = None, 
+    search: str = None,
+    genre_id: str = "",
     db: Session = Depends(get_db)
 ):
     query = db.query(Book)
@@ -21,14 +22,20 @@ def list_books(
     if search:
         query = query.filter(Book.title.ilike(f"%{search}%"))
 
+    if genre_id:
+        query = query.filter(Book.genre_id == int(genre_id))
+
     books = query.all()
+    genres = db.query(Genre).all()
 
     return templates.TemplateResponse(
         name="listing.html",
         request=request,
         context={
             "books": books,
-            "search": search
+            "search": search,
+            "genres": genres,
+            "selected_genre": genre_id
         }
     )
 
