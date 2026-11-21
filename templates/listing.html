@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Books | Digital Library Catalog{% endblock %}
+
+{% block content %}
+<h2>
+    {% if current_genre %}
+        {{ current_genre }} Books
+    {% else %}
+        Our Book Collection
+    {% endif %}
+</h2>
+
+<form action="/books" method="GET">
+    <input
+        type="text"
+        name="search"
+        placeholder="Search books by title..."
+        value="{{ search or '' }}"
+    >
+
+    <select name="genre_id">
+        <option value="">All Genres</option>
+
+        {% for genre in genres %}
+            <option
+                value="{{ genre.id }}"
+                {% if selected_genre|int == genre.id %}selected{% endif %}
+            >
+                {{ genre.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Apply Filters</button>
+</form>
+
+<div class="book-container">
+    {% for book in books %}
+        <div class="book-card">
+            <img
+                src="{{ url_for('static', path='/images/' + book.cover_image) }}"
+                alt="{{ book.title }}"
+            >
+
+            <h3>{{ book.title }}</h3>
+            <p>Author: {{ book.author.name }}</p>
+            <p>Genre: {{ book.genre.name }}</p>
+            <p>Publication Year: {{ book.publication_year }}</p>
+            <a href="{{ url_for('book_details', book_id=book.id) }}">
+                View Details
+            </a>
+        </div>
+    {% else %}
+    <p>No books found. Try another search.</p>
+    {% endfor %}
+</div>
+{% endblock %}
