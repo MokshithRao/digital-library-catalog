@@ -6,72 +6,157 @@ def seed_database():
     db = SessionLocal()
 
     try:
-        # -------------------------------
-        # 1. INSERT AUTHORS
-        # -------------------------------
+        # -----------------------------------------
+        # 1. INSERT AND UPDATE AUTHORS
+        # -----------------------------------------
 
-        author_names = [
-            "Héctor García and Francesc Miralles",
-            "Paulo Coelho",
-            "Khaled Hosseini",
-            "John Green",
-            "Coltan Scrivner",
-            "Hanya Yanagihara",
-            "Sam Bhagwat",
-            "M. L. Rio",
-            "James Clear",
-            "Cal Newport",
-            "Robert C. Martin",
-            "Eric Matthes",
-            "Morgan Housel",
-            "Yuval Noah Harari",
-            "Matt Haig"
+        author_data = [
+            {
+                "name": "Héctor García and Francesc Miralles",
+                "biography": "Authors known for exploring Japanese philosophy, lifestyle and personal development."
+            },
+            {
+                "name": "Paulo Coelho",
+                "biography": "Brazilian novelist known for philosophical and spiritual themes in his literary works."
+            },
+            {
+                "name": "Khaled Hosseini",
+                "biography": "Afghan-American novelist known for stories exploring friendship, family, love and Afghanistan."
+            },
+            {
+                "name": "John Green",
+                "biography": "American author known for contemporary young adult fiction and stories about life, friendship and relationships."
+            },
+            {
+                "name": "Coltan Scrivner",
+                "biography": "Behavioral scientist whose research explores morbid curiosity, human psychology and our attraction to frightening subjects."
+            },
+            {
+                "name": "Hanya Yanagihara",
+                "biography": "American novelist and editor known for emotionally complex literary fiction."
+            },
+            {
+                "name": "Sam Bhagwat",
+                "biography": "Technology entrepreneur and co-founder of Mastra, associated with the development of AI agent technologies."
+            },
+            {
+                "name": "M. L. Rio",
+                "biography": "American author known for literary fiction, Shakespearean themes and dark academia."
+            },
+            {
+                "name": "James Clear",
+                "biography": "Author and speaker known for research-based ideas about habits, behavior and personal improvement."
+            },
+            {
+                "name": "Cal Newport",
+                "biography": "Author and computer science professor known for his work on productivity, concentration and focused work."
+            },
+            {
+                "name": "Robert C. Martin",
+                "biography": "Software engineer and author known for software craftsmanship, clean coding principles and software architecture."
+            },
+            {
+                "name": "Eric Matthes",
+                "biography": "Programming educator and author known for creating practical learning resources for Python programming."
+            },
+            {
+                "name": "Morgan Housel",
+                "biography": "Financial writer and author known for explaining the relationship between psychology, money and financial decisions."
+            },
+            {
+                "name": "Yuval Noah Harari",
+                "biography": "Historian and author known for exploring human history, civilization and the development of human societies."
+            },
+            {
+                "name": "Matt Haig",
+                "biography": "British novelist and author known for contemporary fiction exploring human experiences, emotions and mental well-being."
+            }
         ]
 
-        for name in author_names:
+        for data in author_data:
             existing_author = db.query(Author).filter(
-                Author.name == name
+                Author.name == data["name"]
             ).first()
 
-            if not existing_author:
-                db.add(Author(name=name))
+            if existing_author:
+                existing_author.biography = data["biography"]
+            else:
+                db.add(Author(**data))
 
         db.commit()
-        print("Authors added successfully!")
+        print("Authors added/updated successfully!")
 
-        # -------------------------------
-        # 2. INSERT GENRES
-        # -------------------------------
+        # -----------------------------------------
+        # 2. INSERT AND UPDATE GENRES
+        # -----------------------------------------
 
-        genre_names = [
-            "Self-help",
-            "Fiction",
-            "Historical Fiction",
-            "Young Adult",
-            "Literary Fiction",
-            "Science",
-            "Technology",
-            "Mystery",
-            "Productivity",
-            "Programming",
-            "Finance",
-            "History"
+        genre_data = [
+            {
+                "name": "Self-help",
+                "description": "Books focused on personal development, habits, motivation and self-improvement."
+            },
+            {
+                "name": "Fiction",
+                "description": "Imaginative stories featuring fictional characters, events and settings."
+            },
+            {
+                "name": "Historical Fiction",
+                "description": "Stories set in historical periods, combining fictional characters and events with historical settings."
+            },
+            {
+                "name": "Young Adult",
+                "description": "Literature primarily written for teenage and young adult readers, often exploring identity, friendship and growing up."
+            },
+            {
+                "name": "Literary Fiction",
+                "description": "Character-driven stories that explore human experiences, relationships and complex themes."
+            },
+            {
+                "name": "Science",
+                "description": "Books exploring scientific discoveries, research, human behavior and the natural world."
+            },
+            {
+                "name": "Technology",
+                "description": "Books about technological developments, computing, artificial intelligence and innovation."
+            },
+            {
+                "name": "Mystery",
+                "description": "Stories involving suspense, investigations, secrets and the discovery of hidden truths."
+            },
+            {
+                "name": "Productivity",
+                "description": "Books about time management, concentration, effective work habits and personal efficiency."
+            },
+            {
+                "name": "Programming",
+                "description": "Books that teach programming languages, software development techniques and coding principles."
+            },
+            {
+                "name": "Finance",
+                "description": "Books exploring money management, investing, financial decisions and financial behavior."
+            },
+            {
+                "name": "History",
+                "description": "Books exploring past events, historical figures, civilizations and the development of human societies."
+            }
         ]
 
-        for name in genre_names:
+        for data in genre_data:
             existing_genre = db.query(Genre).filter(
-                Genre.name == name
+                Genre.name == data["name"]
             ).first()
 
-            if not existing_genre:
-                db.add(Genre(name=name))
+            if existing_genre:
+                existing_genre.description = data["description"]
+            else:
+                db.add(Genre(**data))
 
         db.commit()
-        print("Genres added successfully!")
+        print("Genres added/updated successfully!")
 
-        # -------------------------------
+        # -----------------------------------------
         # 3. RETRIEVE AUTHORS AND GENRES
-        # -------------------------------
+        # -----------------------------------------
 
         authors = {
             author.name: author
@@ -83,9 +168,9 @@ def seed_database():
             for genre in db.query(Genre).all()
         }
 
-        # -------------------------------
+        # -----------------------------------------
         # 4. BOOK DATA
-        # -------------------------------
+        # -----------------------------------------
 
         book_data = [
             {
@@ -240,9 +325,9 @@ def seed_database():
             }
         ]
 
-        # -------------------------------
+        # -----------------------------------------
         # 5. INSERT BOOKS
-        # -------------------------------
+        # -----------------------------------------
 
         added_books = 0
 
@@ -274,10 +359,28 @@ def seed_database():
 
         print(f"{added_books} new books added successfully!")
 
+        # -----------------------------------------
+        # 6. DATABASE SUMMARY
+        # -----------------------------------------
+
         print("\nDatabase Summary:")
         print("Authors:", db.query(Author).count())
         print("Genres:", db.query(Genre).count())
         print("Books:", db.query(Book).count())
+
+        # Check for missing biographies
+        missing_biographies = db.query(Author).filter(
+            Author.biography.is_(None)
+        ).count()
+
+        # Check for missing genre descriptions
+        missing_descriptions = db.query(Genre).filter(
+            Genre.description.is_(None)
+        ).count()
+
+        print("\nData Verification:")
+        print("Authors without biographies:", missing_biographies)
+        print("Genres without descriptions:", missing_descriptions)
 
     except Exception as error:
         db.rollback()
