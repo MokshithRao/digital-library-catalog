@@ -15,6 +15,7 @@ def list_books(
     request: Request, 
     search: str = None,
     genre_id: str = "",
+    sort_by: str = "title",
     db: Session = Depends(get_db)
 ):
     query = db.query(Book)
@@ -24,6 +25,24 @@ def list_books(
 
     if genre_id:
         query = query.filter(Book.genre_id == int(genre_id))
+
+# Apply the selected sorting order to the books query.
+    if sort_by == "title":
+        query = query.order_by(Book.title.asc())
+
+    elif sort_by == "title_desc":
+        query = query.order_by(Book.title.desc())
+
+    elif sort_by == "year_asc":
+        query = query.order_by(Book.publication_year.asc())
+
+    elif sort_by == "year_desc":
+        query = query.order_by(Book.publication_year.desc())
+
+    else:
+        query = query.order_by(Book.title.asc())
+
+
 
     books = query.all()
     genres = db.query(Genre).all()
@@ -36,9 +55,10 @@ def list_books(
             "search": search,
             "genres": genres,
             "selected_genre": genre_id,
+            "sort_by": sort_by,
             "next_url": request.url.path + (
     "?" + request.url.query if request.url.query else "")
-    
+
         }
     )
 

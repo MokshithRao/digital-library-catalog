@@ -32,7 +32,29 @@
         {% endfor %}
     </select>
 
+    <!-- Allow users to select their preferred book sorting order. -->
+    <select name="sort_by">
+        <option value="title" {% if sort_by == "title" %}selected{% endif %}>
+            Title (A-Z)
+        </option>
+
+        <option value="title_desc" {% if sort_by == "title_desc" %}selected{% endif %}>
+            Title (Z-A)
+        </option>
+
+        <option value="year_asc" {% if sort_by == "year_asc" %}selected{% endif %}>
+            Oldest First
+        </option>
+
+        <option value="year_desc" {% if sort_by == "year_desc" %}selected{% endif %}>
+            Newest First
+        </option>
+    </select>
+
     <button type="submit">Apply Filters</button>
+
+    
+
 </form>
 
 <div class="book-container">
