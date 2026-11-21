@@ -73,8 +73,20 @@
                 View Details
             </a>
         </div>
+
     {% else %}
-    <p>No books found. Try another search.</p>
+        {% if search and selected_genre %}
+            <p>No books found matching your search and selected genre.</p>
+
+        {% elif search %}
+            <p>No books found matching "{{ search }}".</p>
+
+        {% elif current_genre %}
+            <p>No books available in this genre.</p>
+
+        {% else %}
+            <p>No books available.</p>
+        {% endif %}
     {% endfor %}
 </div>
 {% endblock %}
