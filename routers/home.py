@@ -21,3 +21,11 @@ def home(request: Request, db: Session = Depends(get_db)):
         request=request,
         context={"genres": genres}
     )
+
+
+@router.get("/about")
+def about(request: Request):
+    return templates.TemplateResponse(
+        name="about.html",
+        request=request
+    )
