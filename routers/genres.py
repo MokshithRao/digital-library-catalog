@@ -36,6 +36,7 @@ def genre_books(
             "genres": genres,
             "search": "",
             "selected_genre": genre_id,
-            "current_genre": genre.name
+            "current_genre": genre.name,
+            "next_url": str(request.url)
         }
     )

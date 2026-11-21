@@ -32,7 +32,29 @@
         {% endfor %}
     </select>
 
+    <!-- Allow users to select their preferred book sorting order. -->
+    <select name="sort_by">
+        <option value="title" {% if sort_by == "title" %}selected{% endif %}>
+            Title (A-Z)
+        </option>
+
+        <option value="title_desc" {% if sort_by == "title_desc" %}selected{% endif %}>
+            Title (Z-A)
+        </option>
+
+        <option value="year_asc" {% if sort_by == "year_asc" %}selected{% endif %}>
+            Oldest First
+        </option>
+
+        <option value="year_desc" {% if sort_by == "year_desc" %}selected{% endif %}>
+            Newest First
+        </option>
+    </select>
+
     <button type="submit">Apply Filters</button>
+
+    
+
 </form>
 
 <div class="book-container">
@@ -47,12 +69,24 @@
             <p>Author: {{ book.author.name }}</p>
             <p>Genre: {{ book.genre.name }}</p>
             <p>Publication Year: {{ book.publication_year }}</p>
-            <a href="{{ url_for('book_details', book_id=book.id) }}">
+            <a href="{{ url_for('book_details', book_id=book.id) }}?next_url={{ next_url | urlencode }}">
                 View Details
             </a>
         </div>
+
     {% else %}
-    <p>No books found. Try another search.</p>
+        {% if search and selected_genre %}
+            <p>No books found matching your search and selected genre.</p>
+
+        {% elif search %}
+            <p>No books found matching "{{ search }}".</p>
+
+        {% elif current_genre %}
+            <p>No books available in this genre.</p>
+
+        {% else %}
+            <p>No books available.</p>
+        {% endif %}
     {% endfor %}
 </div>
 {% endblock %}
