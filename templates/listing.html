@@ -3,7 +3,13 @@
 {% block title %}Books | Digital Library Catalog{% endblock %}
 
 {% block content %}
-<h2>Our Book Collection</h2>
+<h2>
+    {% if current_genre %}
+        {{ current_genre }} Books
+    {% else %}
+        Our Book Collection
+    {% endif %}
+</h2>
 
 <form action="/books" method="GET">
     <input
