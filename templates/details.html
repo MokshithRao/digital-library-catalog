@@ -23,7 +23,7 @@
         {{ "Available" if book.is_available else "Unavailable" }}
     </p>
 
-    <a href="/books">Back to Books</a>
+    <a href="{{ next_url }}">Back</a>
 
 </div>
 {% endblock %}

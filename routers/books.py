@@ -35,7 +35,10 @@ def list_books(
             "books": books,
             "search": search,
             "genres": genres,
-            "selected_genre": genre_id
+            "selected_genre": genre_id,
+            "next_url": request.url.path + (
+    "?" + request.url.query if request.url.query else "")
+    
         }
     )
 
@@ -45,8 +48,13 @@ def list_books(
 def book_details(
     book_id: int,
     request: Request,
+    next_url: str = "/books",
     db: Session = Depends(get_db)
 ):
+
+    if not next_url.startswith("/") or next_url.startswith("//"):
+        next_url = "/books"
+
     book = db.query(Book).filter(Book.id == book_id).first()
 
     if not book:
@@ -58,7 +66,10 @@ def book_details(
     return templates.TemplateResponse(
         name="details.html",
         request=request,
-        context={"book": book}
+        context={
+            "book": book,
+            "next_url": next_url
+        }
     )
 
 
