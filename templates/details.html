@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} | Digital Library Catalog{% endblock %}
+
+{% block content %}
+<div class="book-details">
+
+    <h2>{{ book.title }}</h2>
+
+    <img
+        src="{{ url_for('static', path='/images/' + book.cover_image) }}"
+        alt="{{ book.title }}"
+        width="200"
+    >
+
+    <p><strong>Author:</strong> {{ book.author.name }}</p>
+    <p><strong>Genre:</strong> {{ book.genre.name }}</p>
+    <p><strong>Description:</strong> {{ book.description }}</p>
+    <p><strong>ISBN:</strong> {{ book.isbn or "Not available" }}</p>
+    <p><strong>Publisher:</strong> {{ book.publisher }}</p>
+    <p><strong>Publication Year:</strong> {{ book.publication_year }}</p>
+    <p><strong>Availability:</strong>
+        {{ "Available" if book.is_available else "Unavailable" }}
+    </p>
+
+    <a href="/books">Back to Books</a>
+
+</div>
+{% endblock %}
