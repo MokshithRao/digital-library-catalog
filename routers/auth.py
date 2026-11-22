@@ -1,21 +1,21 @@
 from fastapi import APIRouter, Request, Depends, Form
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from typing import Annotated
 from sqlalchemy.orm import Session
 import secrets
 import hashlib
 from datetime import datetime, timedelta
 
+from template_config import templates
 from dependencies import get_db
 from models import User, UserSession
 from security import hash_password, verify_password
 from validators import validate_username, validate_email_address, validate_password
+from auth_dependencies import get_current_user
 
 
 router = APIRouter()
 
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/register")
@@ -135,5 +135,37 @@ def login_user(
         max_age=7 * 24 * 60 * 60,
         path="/"
     )
+
+    return response
+
+
+
+
+@router.post("/logout")
+def logout_user(
+    request: Request,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    # Find and revoke the current user's session.
+    session_token = request.cookies.get("session_token")
+    token_hash = hashlib.sha256(session_token.encode()).hexdigest()
+
+    user_session = db.query(UserSession).filter(
+        UserSession.token_hash == token_hash
+    ).first()
+
+
+    if user_session:
+        user_session.revoked_at = datetime.utcnow()
+        db.commit()
+
+
+    # Clear the session cookie and redirect to the login page.
+    response = RedirectResponse(
+        url="/login", status_code=303
+    )
+
+    response.delete_cookie(key="session_token", path="/")
 
     return response

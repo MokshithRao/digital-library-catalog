@@ -1,23 +1,18 @@
 from fastapi import APIRouter, Request, Depends
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from typing import Annotated
 
 from dependencies import get_db
-from models import Genre, Book, User
-from auth_dependencies import get_current_user
+from models import Genre, Book
+from template_config import templates
 
 
 router = APIRouter()
 
 
-templates = Jinja2Templates(directory="templates")
-
 
 @router.get("/")
 def home(
     request: Request,
-    current_user: Annotated[User, Depends(get_current_user)],
     db: Session = Depends(get_db)
 ):
 
