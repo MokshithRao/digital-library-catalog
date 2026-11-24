@@ -3,17 +3,27 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
+<section aria-labelledby="admin-title">
+    <p class="eyebrow">Catalog administration</p>
+    <h1 id="admin-title">Admin Dashboard</h1>
+    <p class="admin-welcome">Welcome, {{ current_user.username }}!</p>
 
-<h2>Admin Dashboard</h2>
-
-<p>Welcome, {{ current_user.username }}!</p>
-
-<h3>Administration</h3>
-
-<ul>
-    <li>Manage Books</li>
-    <li>Manage Genres</li>
-    <li>Manage Users</li>
-</ul>
-
+    <div class="section-heading">
+        <h2>Administration</h2>
+    </div>
+    <ul class="admin-grid">
+        <li class="admin-card">
+            <h3>Manage Books</h3>
+            <p>Book administration</p>
+        </li>
+        <li class="admin-card">
+            <h3>Manage Genres</h3>
+            <p>Genre administration</p>
+        </li>
+        <li class="admin-card">
+            <h3>Manage Users</h3>
+            <p>User administration</p>
+        </li>
+    </ul>
+</section>
 {% endblock %}

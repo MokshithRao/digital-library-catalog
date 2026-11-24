@@ -3,34 +3,59 @@
 {% block title %}{{ book.title }} | Digital Library Catalog{% endblock %}
 
 {% block content %}
-<div class="book-details">
+<article class="book-details">
+    <div class="details-cover">
+        <img
+            src="{{ url_for('static', path='/images/' + book.cover_image) }}"
+            alt="Cover of {{ book.title }}"
+        >
+    </div>
 
-    <h2>{{ book.title }}</h2>
+    <div class="details-content">
+        <p class="eyebrow">{{ book.genre.name }}</p>
+        <h1>{{ book.title }}</h1>
+        <p class="details-author">by {{ book.author.name }}</p>
 
-    <img
-        src="{{ url_for('static', path='/images/' + book.cover_image) }}"
-        alt="{{ book.title }}"
-        width="200"
-    >
+        <p class="availability {% if not book.is_available %}availability-unavailable{% endif %}">
+            {% if book.is_available %}
+                Available for borrowing
+            {% else %}
+                Currently unavailable
+            {% endif %}
+        </p>
 
-    <p><strong>Author:</strong> {{ book.author.name }}</p>
-    <p><strong>About the Author:</strong> {{ book.author.biography or "Biography not available." }}</p>
-    <p><strong>Genre:</strong> {{ book.genre.name }}</p>
-    <p><strong>About the Genre:</strong> {{ book.genre.description or "Description not available." }}</p>
-    <p><strong>Description:</strong> {{ book.description }}</p>
-    <p><strong>ISBN:</strong> {{ book.isbn or "Not available" }}</p>
-    <p><strong>Publisher:</strong> {{ book.publisher }}</p>
-    <p><strong>Publication Year:</strong> {{ book.publication_year }}</p>
-    <p>
-        <strong>Availability:</strong>
-        {% if book.is_available %}
-            Available for borrowing
-        {% else %}
-            Currently unavailable
-        {% endif %}
-    </p>
+        <p class="details-description">{{ book.description }}</p>
 
-    <a href="{{ next_url }}">Back</a>
+        <dl class="details-facts">
+            <div class="detail-fact">
+                <dt>ISBN</dt>
+                <dd>{{ book.isbn or "Not available" }}</dd>
+            </div>
+            <div class="detail-fact">
+                <dt>Publisher</dt>
+                <dd>{{ book.publisher }}</dd>
+            </div>
+            <div class="detail-fact">
+                <dt>Publication year</dt>
+                <dd>{{ book.publication_year }}</dd>
+            </div>
+            <div class="detail-fact">
+                <dt>Genre</dt>
+                <dd>{{ book.genre.name }}</dd>
+            </div>
+        </dl>
 
-</div>
+        <section class="details-section" aria-labelledby="author-title">
+            <h2 id="author-title">About the author</h2>
+            <p>{{ book.author.biography or "Biography not available." }}</p>
+        </section>
+
+        <section class="details-section" aria-labelledby="genre-title">
+            <h2 id="genre-title">About the genre</h2>
+            <p>{{ book.genre.description or "Description not available." }}</p>
+        </section>
+
+        <a class="back-link" href="{{ next_url }}">← Back to the collection</a>
+    </div>
+</article>
 {% endblock %}
