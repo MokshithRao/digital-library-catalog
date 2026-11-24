@@ -1,14 +1,11 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-
+from template_config import templates
 from dependencies import get_db
 from models import Book, Genre
 
 
 router = APIRouter()
-
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/{genre_id}")
