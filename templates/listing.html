@@ -3,90 +3,106 @@
 {% block title %}Books | Digital Library Catalog{% endblock %}
 
 {% block content %}
-<h2>
-    {% if current_genre %}
-        {{ current_genre }} Books
-    {% else %}
-        Our Book Collection
-    {% endif %}
-</h2>
+<section aria-labelledby="books-title">
+    <p class="eyebrow">Browse the catalog</p>
+    <h1 id="books-title">
+        {% if current_genre %}
+            {{ current_genre }} Books
+        {% else %}
+            Our Book Collection
+        {% endif %}
+    </h1>
+    <p class="page-intro">Search the collection, narrow by genre, or sort to find a book to explore.</p>
 
-<form action="/books" method="GET">
-    <input
-        type="text"
-        name="search"
-        placeholder="Search books by title..."
-        value="{{ search or '' }}"
-    >
+    <div class="filter-panel">
+        <form class="filter-form" action="/books" method="GET" role="search">
+            <div class="field">
+                <label for="book-search">Search by title</label>
+                <input
+                    id="book-search"
+                    type="text"
+                    name="search"
+                    placeholder="Enter a book title"
+                    value="{{ search or '' }}"
+                >
+            </div>
 
-    <select name="genre_id">
-        <option value="">All Genres</option>
+            <div class="field">
+                <label for="genre-filter">Genre</label>
+                <select id="genre-filter" name="genre_id">
+                    <option value="">All Genres</option>
 
-        {% for genre in genres %}
-            <option
-                value="{{ genre.id }}"
-                {% if selected_genre|int == genre.id %}selected{% endif %}
-            >
-                {{ genre.name }}
-            </option>
-        {% endfor %}
-    </select>
+                    {% for genre in genres %}
+                        <option
+                            value="{{ genre.id }}"
+                            {% if selected_genre|int == genre.id %}selected{% endif %}
+                        >
+                            {{ genre.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-    <!-- Allow users to select their preferred book sorting order. -->
-    <select name="sort_by">
-        <option value="title" {% if sort_by == "title" %}selected{% endif %}>
-            Title (A-Z)
-        </option>
+            <div class="field">
+                <label for="sort-books">Sort by</label>
+                <select id="sort-books" name="sort_by">
+                    <option value="title" {% if sort_by == "title" %}selected{% endif %}>
+                        Title (A-Z)
+                    </option>
 
-        <option value="title_desc" {% if sort_by == "title_desc" %}selected{% endif %}>
-            Title (Z-A)
-        </option>
+                    <option value="title_desc" {% if sort_by == "title_desc" %}selected{% endif %}>
+                        Title (Z-A)
+                    </option>
 
-        <option value="year_asc" {% if sort_by == "year_asc" %}selected{% endif %}>
-            Oldest First
-        </option>
+                    <option value="year_asc" {% if sort_by == "year_asc" %}selected{% endif %}>
+                        Oldest First
+                    </option>
 
-        <option value="year_desc" {% if sort_by == "year_desc" %}selected{% endif %}>
-            Newest First
-        </option>
-    </select>
+                    <option value="year_desc" {% if sort_by == "year_desc" %}selected{% endif %}>
+                        Newest First
+                    </option>
+                </select>
+            </div>
 
-    <button type="submit">Apply Filters</button>
-
-    
-
-</form>
+            <button type="submit">Apply filters</button>
+        </form>
+    </div>
+</section>
 
 <div class="book-container">
     {% for book in books %}
-        <div class="book-card">
-            <img
-                src="{{ url_for('static', path='/images/' + book.cover_image) }}"
-                alt="{{ book.title }}"
-            >
-
-            <h3>{{ book.title }}</h3>
-            <p>Author: {{ book.author.name }}</p>
-            <p>Genre: {{ book.genre.name }}</p>
-            <p>Publication Year: {{ book.publication_year }}</p>
-            <a href="{{ url_for('book_details', book_id=book.id) }}?next_url={{ next_url | urlencode }}">
-                View Details
-            </a>
-        </div>
+        <article class="book-card">
+            <div class="book-cover">
+                <img
+                    src="{{ url_for('static', path='/images/' + book.cover_image) }}"
+                    alt="Cover of {{ book.title }}"
+                >
+            </div>
+            <div class="book-card-content">
+                <h3>{{ book.title }}</h3>
+                <p class="book-card-author">{{ book.author.name }}</p>
+                <p class="book-card-meta">{{ book.genre.name }} · {{ book.publication_year }}</p>
+                <a class="button" href="{{ url_for('book_details', book_id=book.id) }}?next_url={{ next_url | urlencode }}">
+                    View details
+                </a>
+            </div>
+        </article>
 
     {% else %}
-        {% if search and selected_genre %}
-            <p>No books found matching your search and selected genre.</p>
+        <div class="empty-state" role="status">
+            {% if search and selected_genre %}
+                <p>No books found matching your search and selected genre.</p>
 
-        {% elif search %}
-            <p>No books found matching "{{ search }}".</p>
+            {% elif search %}
+                <p>No books found matching "{{ search }}".</p>
 
-        {% elif current_genre %}
-            <p>No books available in this genre.</p>
+            {% elif current_genre %}
+                <p>No books available in this genre.</p>
 
-        {% else %}
-            <p>No books available.</p>
-        {% endif %}
+            {% else %}
+                <p>No books available.</p>
+            {% endif %}
+        </div>
     {% endfor %}
 </div>
 {% endblock %}

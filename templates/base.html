@@ -7,35 +7,44 @@
     <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
 
-    <header>
-        <h1>Digital Library Catalog</h1>
-        <nav>
-            <a href="{{ url_for('home') }}">Home</a>
-            <a href="{{ url_for('list_books') }}">Books</a>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="{{ url_for('home') }}" aria-label="Digital Library Catalog home">
+                <span class="brand-mark" aria-hidden="true">DL</span>
+                <span class="brand-name">Digital Library Catalog</span>
+            </a>
+            <nav class="site-nav" aria-label="Main navigation">
+            <a href="{{ url_for('home') }}" {% if request.url.path == "/" %}aria-current="page"{% endif %}>Home</a>
+            <a href="{{ url_for('list_books') }}" {% if request.url.path.startswith("/books") or request.url.path.startswith("/genres") %}aria-current="page"{% endif %}>Books</a>
             {% if current_user and current_user.role == "admin" %}
-                <a href="/admin/">Admin Dashboard</a>
+                <a href="/admin/" {% if request.url.path.startswith("/admin") %}aria-current="page"{% endif %}>Admin Dashboard</a>
             {% endif %}
-            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('about') }}" {% if request.url.path == "/about" %}aria-current="page"{% endif %}>About</a>
             {% if current_user %}
-                <span>Welcome, {{ current_user.username }}</span>
+                <span class="user-name">Welcome, {{ current_user.username }}</span>
 
-                <form action="/logout" method="POST">
+                <form class="logout-form" action="/logout" method="POST">
                     <button type="submit">Logout</button>
                 </form>
             {% else %}
-                <a href="{{ url_for('register_page') }}">Register</a>
-                <a href="{{ url_for('login_page') }}">Login</a>
+                <a href="{{ url_for('register_page') }}" {% if request.url.path == "/register" %}aria-current="page"{% endif %}>Register</a>
+                <a href="{{ url_for('login_page') }}" {% if request.url.path == "/login" %}aria-current="page"{% endif %}>Login</a>
             {% endif %}
-        </nav>
+            </nav>
+        </div>
     </header>
 
-    <main>
+    <main class="site-main container" id="main-content">
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
-        <p>&copy; 2026 Digital Library Catalog</p>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span class="footer-brand">Digital Library Catalog</span>
+            <p>&copy; 2026 Digital Library Catalog</p>
+        </div>
     </footer>
 
 </body>
