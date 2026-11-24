@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Add Genre | Digital Library Catalog{% endblock %}
+
+{% block content %}
+<section aria-labelledby="add-genre-title">
+    <p class="eyebrow">Catalog administration</p>
+    <h1 id="add-genre-title">Add New Genre</h1>
+
+    <form action="/genres/add" method="POST">
+
+        <div class="field">
+            <label for="name">Genre Name</label>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                required
+            >
+        </div>
+
+        <div class="field">
+            <label for="description">Genre Description</label>
+            <textarea
+                id="description"
+                name="description"
+            ></textarea>
+        </div>
+
+        <button type="submit">Add Genre</button>
+
+    </form>
+</section>
+{% endblock %}

@@ -9,17 +9,47 @@
     <p class="admin-welcome">Welcome, {{ current_user.username }}!</p>
 
     <div class="section-heading">
+        <h2>Library Overview</h2>
+    </div>
+
+    <ul class="admin-grid">
+        <li class="admin-card">
+            <h3>Total Books</h3>
+            <p>{{ total_books }}</p>
+        </li>
+
+        <li class="admin-card">
+            <h3>Total Genres</h3>
+            <p>{{ total_genres }}</p>
+        </li>
+
+        <li class="admin-card">
+            <h3>Total Users</h3>
+            <p>{{ total_users }}</p>
+        </li>
+
+        <li class="admin-card">
+            <h3>Total Admins</h3>
+            <p>{{ total_admins }}</p>
+        </li>
+    </ul>
+
+    <div class="section-heading">
         <h2>Administration</h2>
     </div>
+
     <ul class="admin-grid">
         <li class="admin-card">
             <h3>Manage Books</h3>
             <p>Book administration</p>
         </li>
+
         <li class="admin-card">
             <h3>Manage Genres</h3>
             <p>Genre administration</p>
+            <a href="/genres/add" class="button">Add New Genre</a>
         </li>
+
         <li class="admin-card">
             <h3>Manage Users</h3>
             <p>User administration</p>

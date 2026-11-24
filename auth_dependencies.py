@@ -33,7 +33,7 @@ def get_current_user(
     # Retrieve the active user associated with the session.
     user = db.query(User).filter(
         User.id == user_session.user_id,
-        User.is_active == True
+        User.is_active.is_(True)
     ).first()
 
     if not user:

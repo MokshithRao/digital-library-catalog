@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Request, Depends, HTTPException, Form, File, UploadFile
+from fastapi.responses import RedirectResponse
+from pathlib import Path
+from uuid import uuid4
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from template_config import templates
 from dependencies import get_db
-from models import Book, Genre
+from models import Book, Genre, Author
+from auth_dependencies import require_admin
 
 router = APIRouter()
 
@@ -61,6 +66,203 @@ def list_books(
 
 
 
+# Display the form for adding a new book (admin only).
+@router.get("/add")
+def add_book_form(
+    request: Request,
+    current_user= Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    authors = db.query(Author).order_by(Author.name.asc()).all()
+    genres = db.query(Genre).order_by(Genre.name.asc()).all()
+
+    return templates.TemplateResponse(
+        name="add_book.html",
+        request=request,
+        context={
+            "authors": authors,
+            "genres": genres,
+            "current_user": current_user
+        }
+    )
+
+
+
+# Create a new book and its author (if needed), with admin authorization.
+@router.post("/add")
+async def create_book(
+    title: str = Form(...),
+    description: str = Form(""),
+    isbn: str = Form(""),
+    publisher: str = Form(""),
+    publication_year: str = Form(""),
+    genre_id: int = Form(...),
+    author_mode: str = Form(...),
+    author_id: str = Form(""),
+    author_name: str = Form(""),
+    author_biography: str = Form(""),
+    is_available: str = Form("true"),
+    cover_image: UploadFile = File(...),
+    current_user = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    image_path = None
+
+    try:
+        # Validate the uploaded image.
+        allowed_types = {"image/jpeg", "image/png", "image/webp"}
+
+        if cover_image.content_type not in allowed_types:
+            raise HTTPException(
+                status_code=400,
+                detail="Only JPEG, PNG and WebP images are allowed."
+            )
+
+        extension = Path(cover_image.filename).suffix.lower()
+
+        if extension not in {".jpg", ".jpeg", ".png", ".webp"}:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid image extension."
+            )
+
+        image_directory = Path("static/images")
+        image_directory.mkdir(parents=True, exist_ok=True)
+
+        image_filename = f"{uuid4().hex}{extension}"
+        image_path = image_directory / image_filename
+
+        image_data = await cover_image.read()
+
+        if not image_data:
+            raise HTTPException(
+                status_code=400,
+                detail="Uploaded image is empty."
+            )
+
+        if len(image_data) > 5 * 1024 * 1024:
+            raise HTTPException(
+                status_code=400,
+                detail="Image size must not exceed 5 MB."
+            )
+
+        image_path.write_bytes(image_data)
+
+        # Validate the publication year.
+        publication_year_value = None
+
+        if publication_year.strip():
+            try:
+                publication_year_value = int(publication_year)
+            except ValueError:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Publication year must be a valid number."
+                )
+
+        # Validate author selection.
+        if author_mode not in {"existing", "new"}:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid author selection."
+            )
+
+        # Validate availability selection.
+        if is_available not in {"true", "false"}:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid availability value."
+            )
+
+        # Check whether the selected genre exists.
+        genre = db.query(Genre).filter(
+            Genre.id == genre_id
+        ).first()
+
+        if not genre:
+            raise HTTPException(
+                status_code=400,
+                detail="Selected genre does not exist."
+            )
+
+        # Select an existing author or create a new one.
+        if author_mode == "existing":
+
+            if not author_id.isdigit():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Please select an author."
+                )
+
+            author = db.query(Author).filter(
+                Author.id == int(author_id)
+            ).first()
+
+            if not author:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Selected author does not exist."
+                )
+
+        else:
+            if not author_name.strip():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Author name is required."
+                )
+
+            author = db.query(Author).filter(
+                func.lower(Author.name) == author_name.strip().lower()
+            ).first()
+
+            if not author:
+                author = Author(
+                    name=author_name.strip(),
+                    biography=author_biography.strip() or None
+                )
+
+                db.add(author)
+                db.flush()
+
+        # Create the new book.
+        book = Book(
+            title=title.strip(),
+            description=description.strip() or None,
+            isbn=isbn.strip() or None,
+            publisher=publisher.strip() or None,
+            publication_year=publication_year_value,
+            cover_image=image_filename,
+            is_available=(is_available == "true"),
+            author_id=author.id,
+            genre_id=genre.id
+        )
+
+        db.add(book)
+
+        # Commit author and book together.
+        db.commit()
+
+        return RedirectResponse(
+            url="/books",
+            status_code=303
+        )
+
+    except Exception:
+        # Roll back database changes if anything fails.
+        db.rollback()
+
+        # Remove uploaded image if database processing fails.
+        if image_path and image_path.exists():
+            image_path.unlink()
+
+        raise
+
+    finally:
+        await cover_image.close()
+
+
+
+
 @router.get("/{book_id}")
 def book_details(
     book_id: int,
@@ -88,5 +290,6 @@ def book_details(
             "next_url": next_url
         }
     )
+
 
 
