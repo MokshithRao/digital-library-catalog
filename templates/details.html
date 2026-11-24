@@ -55,6 +55,12 @@
             <p>{{ book.genre.description or "Description not available." }}</p>
         </section>
 
+        {% if current_user and current_user.role == "admin" %}
+            <a class="button" href="/books/{{ book.id }}/edit">
+                Edit Book
+            </a>
+        {% endif %}
+
         <a class="back-link" href="{{ next_url }}">← Back to the collection</a>
     </div>
 </article>

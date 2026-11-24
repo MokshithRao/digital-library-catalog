@@ -293,3 +293,169 @@ def book_details(
 
 
 
+# Display the edit form for an existing book (admin only).
+@router.get("/{book_id}/edit")
+def edit_book_form(
+    book_id: int,
+    request: Request,
+    current_user=Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    book = db.query(Book).filter(Book.id == book_id).first()
+
+    if not book:
+        raise HTTPException(
+            status_code=404,
+            detail="Book not found."
+        )
+
+    authors = db.query(Author).order_by(Author.name.asc()).all()
+    genres = db.query(Genre).order_by(Genre.name.asc()).all()
+
+    return templates.TemplateResponse(
+        name="edit_book.html",
+        request=request,
+        context={
+            "book": book,
+            "authors": authors,
+            "genres": genres,
+            "current_user": current_user
+        }
+    )
+
+
+
+
+
+# Update an existing book with admin authorization.
+@router.post("/{book_id}/edit")
+async def update_book(
+    book_id: int,
+    title: str = Form(...),
+    description: str = Form(""),
+    isbn: str = Form(""),
+    publisher: str = Form(""),
+    publication_year: str = Form(""),
+    genre_id: int = Form(...),
+    author_id: int = Form(...),
+    is_available: str = Form("true"),
+    cover_image: UploadFile = File(None),
+    current_user=Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    image_path = None
+
+    try:
+        book = db.query(Book).filter(Book.id == book_id).first()
+
+        if not book:
+            raise HTTPException(
+                status_code=404,
+                detail="Book not found."
+            )
+
+        genre = db.query(Genre).filter(
+            Genre.id == genre_id
+        ).first()
+
+        author = db.query(Author).filter(
+            Author.id == author_id
+        ).first()
+
+        if not genre or not author:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid author or genre selection."
+            )
+
+        if is_available not in {"true", "false"}:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid availability value."
+            )
+
+        publication_year_value = None
+
+        if publication_year.strip():
+            try:
+                publication_year_value = int(publication_year)
+            except ValueError:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Publication year must be a valid number."
+                )
+
+        new_image_filename = None
+
+        # Process a new cover image if one was uploaded.
+        if cover_image and cover_image.filename:
+
+            allowed_types = {"image/jpeg", "image/png", "image/webp"}
+
+            if cover_image.content_type not in allowed_types:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Only JPEG, PNG and WebP images are allowed."
+                )
+
+            extension = Path(cover_image.filename).suffix.lower()
+
+            if extension not in {".jpg", ".jpeg", ".png", ".webp"}:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Invalid image extension."
+                )
+
+            image_data = await cover_image.read()
+
+            if not image_data:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Uploaded image is empty."
+                )
+
+            if len(image_data) > 5 * 1024 * 1024:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Image size must not exceed 5 MB."
+                )
+
+            image_directory = Path("static/images")
+            image_directory.mkdir(parents=True, exist_ok=True)
+
+            new_image_filename = f"{uuid4().hex}{extension}"
+            image_path = image_directory / new_image_filename
+
+            image_path.write_bytes(image_data)
+
+        # Update book details.
+        book.title = title.strip()
+        book.description = description.strip() or None
+        book.isbn = isbn.strip() or None
+        book.publisher = publisher.strip() or None
+        book.publication_year = publication_year_value
+        book.genre_id = genre.id
+        book.author_id = author.id
+        book.is_available = (is_available == "true")
+
+        if new_image_filename:
+            book.cover_image = new_image_filename
+
+        db.commit()
+
+        return RedirectResponse(
+            url=f"/books/{book.id}",
+            status_code=303
+        )
+
+    except Exception:
+        db.rollback()
+
+        if image_path and image_path.exists():
+            image_path.unlink()
+
+        raise
+
+    finally:
+        if cover_image:
+            await cover_image.close()
