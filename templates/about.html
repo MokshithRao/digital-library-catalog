@@ -3,27 +3,38 @@
 {% block title %}About | Digital Library Catalog{% endblock %}
 
 {% block content %}
+<section class="about-layout" aria-labelledby="about-title">
+    <p class="eyebrow">About the catalog</p>
+    <h1 id="about-title">A library for curious readers</h1>
 
-<h2>About Our Digital Library</h2>
+    <div class="about-intro">
+        <p>
+            Welcome to Digital Library Catalog, a platform designed
+            to help readers explore books, authors, and genres.
+        </p>
+    </div>
 
-<p>
-    Welcome to Digital Library Catalog, a platform designed
-    to help readers explore books, authors, and genres.
-</p>
+    <div class="about-grid">
+        <section class="info-card" aria-labelledby="mission-title">
+            <h2 id="mission-title">Our Mission</h2>
+            <p>
+                Our mission is to make discovering books simple and convenient
+                for everyone.
+            </p>
+        </section>
 
-<h3>Our Mission</h3>
-<p>
-    Our mission is to make discovering books simple and convenient
-    for everyone.
-</p>
+        <section class="info-card" aria-labelledby="contact-title">
+            <h2 id="contact-title">Contact Information</h2>
+            <p><strong>Email:</strong> info@digitallibrary.com</p>
+            <p><strong>Phone:</strong> +91 9876543210</p>
+            <p><strong>Address:</strong> Hyderabad, Telangana, India</p>
+        </section>
 
-<h3>Contact Information</h3>
-<p><strong>Email:</strong> info@digitallibrary.com</p>
-<p><strong>Phone:</strong> +91 9876543210</p>
-<p><strong>Address:</strong> Hyderabad, Telangana, India</p>
-
-<h3>Opening Hours</h3>
-<p>Monday – Saturday: 9:00 AM – 6:00 PM</p>
-<p>Sunday: Closed</p>
-
+        <section class="info-card" aria-labelledby="hours-title">
+            <h2 id="hours-title">Opening Hours</h2>
+            <p>Monday – Saturday: 9:00 AM – 6:00 PM</p>
+            <p>Sunday: Closed</p>
+        </section>
+    </div>
+</section>
 {% endblock %}

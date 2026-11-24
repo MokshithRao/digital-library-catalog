@@ -3,23 +3,31 @@
 {% block title %}Login | Digital Library Catalog{% endblock %}
 
 {% block content %}
+<section class="form-layout" aria-labelledby="login-title">
+    <div class="form-panel">
+        <p class="eyebrow">Welcome back</p>
+        <h1 id="login-title">Sign in</h1>
+        <p class="form-description">Log in to your Digital Library Catalog account.</p>
 
-<h2>Login</h2>
+        {% if error %}
+            <p class="message message-error" role="alert">{{ error }}</p>
+        {% endif %}
 
-{% if error %}
-    <p>{{ error }}</p>
-{% endif %}
+        <form class="account-form" action="/login" method="POST">
+            <div class="field">
+                <label for="login-email">Email</label>
+                <input id="login-email" type="email" name="email" autocomplete="email" required>
+            </div>
 
-<form action="/login" method="POST">
+            <div class="field">
+                <label for="login-password">Password</label>
+                <input id="login-password" type="password" name="password" autocomplete="current-password" required>
+            </div>
 
-    <label>Email:</label>
-    <input type="email" name="email" required>
+            <button type="submit">Login</button>
+        </form>
 
-    <label>Password:</label>
-    <input type="password" name="password" required>
-
-    <button type="submit">Login</button>
-
-</form>
-
+        <p class="form-footnote">New to the catalog? <a href="{{ url_for('register_page') }}">Create an account</a></p>
+    </div>
+</section>
 {% endblock %}
