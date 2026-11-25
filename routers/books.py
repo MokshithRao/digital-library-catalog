@@ -354,6 +354,8 @@ async def update_book(
                 detail="Book not found."
             )
 
+        old_image_filename = book.cover_image
+
         genre = db.query(Genre).filter(
             Genre.id == genre_id
         ).first()
@@ -443,6 +445,14 @@ async def update_book(
 
         db.commit()
 
+        # Remove the old cover image if a replacement was uploaded.
+        if new_image_filename and old_image_filename:
+            image_directory = Path("static/images").resolve()
+            old_image_path = (image_directory / old_image_filename).resolve()
+
+            if old_image_path.parent == image_directory and old_image_path.is_file():
+                old_image_path.unlink()
+                
         return RedirectResponse(
             url=f"/books/{book.id}",
             status_code=303
