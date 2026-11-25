@@ -459,3 +459,43 @@ async def update_book(
     finally:
         if cover_image:
             await cover_image.close()
+
+
+
+
+# Delete an existing book with admin authorization.
+@router.post("/{book_id}/delete")
+def delete_book(
+    book_id: int,
+    current_user = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    book = db.query(Book).filter(Book.id == book_id).first()
+
+    if not book:
+        raise HTTPException(
+            status_code=404,
+            detail= "Book not found."
+        )
+
+    try:
+        image_filename = book.cover_image
+
+        db.delete(book)
+        db.commit()
+
+        if image_filename:
+            image_directory = Path("static/images").resolve()
+            image_path = (image_directory / image_filename).resolve()
+
+            if image_path.parent == image_directory and image_path.is_file():
+                image_path.unlink()
+
+        return RedirectResponse(
+            url='/books',
+            status_code=303
+        )
+
+    except Exception:
+        db.rollback()
+        raise
