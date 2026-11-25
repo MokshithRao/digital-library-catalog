@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Add Book | Digital Library Catalog{% endblock %}
+
+{% block content %}
+<section aria-labelledby="add-book-title">
+    <p class="eyebrow">Catalog administration</p>
+    <h1 id="add-book-title">Add New Book</h1>
+
+    <form action="/books/add" method="POST" enctype="multipart/form-data">
+
+        <div class="field">
+            <label for="title">Book Title</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+
+        <div class="field">
+            <label for="description">Description</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
+
+        <div class="field">
+            <label for="isbn">ISBN</label>
+            <input type="text" id="isbn" name="isbn">
+        </div>
+
+        <div class="field">
+            <label for="publisher">Publisher</label>
+            <input type="text" id="publisher" name="publisher">
+        </div>
+
+        <div class="field">
+            <label for="publication_year">Publication Year</label>
+            <input type="number" id="publication_year" name="publication_year">
+        </div>
+
+        <div class="field">
+            <label for="cover_image">Book Cover</label>
+            <input
+                type="file"
+                id="cover_image"
+                name="cover_image"
+                accept="image/*"
+                required
+            >
+        </div>
+
+        <div class="field">
+            <label for="genre_id">Genre</label>
+            <select id="genre_id" name="genre_id" required>
+                <option value="">Select Genre</option>
+                {% for genre in genres %}
+                    <option value="{{ genre.id }}">{{ genre.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="author_mode">Author Selection</label>
+            <select id="author_mode" name="author_mode">
+                <option value="existing">Select Existing Author</option>
+                <option value="new">Add New Author</option>
+            </select>
+        </div>
+
+        <div class="field" id="existing-author-field">
+            <label for="author_id">Author</label>
+            <select id="author_id" name="author_id">
+                <option value="">Select Author</option>
+                {% for author in authors %}
+                    <option value="{{ author.id }}">{{ author.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="new-author-fields" hidden>
+            <div class="field">
+                <label for="author_name">New Author Name</label>
+                <input type="text" id="author_name" name="author_name">
+            </div>
+
+            <div class="field">
+                <label for="author_biography">Author Biography</label>
+                <textarea id="author_biography" name="author_biography"></textarea>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="is_available">Availability</label>
+            <select id="is_available" name="is_available">
+                <option value="true">Available</option>
+                <option value="false">Unavailable</option>
+            </select>
+        </div>
+
+        <button type="submit">Add Book</button>
+
+    </form>
+</section>
+
+<script>
+    const authorMode = document.getElementById("author_mode");
+    const existingAuthorField = document.getElementById("existing-author-field");
+    const newAuthorFields = document.getElementById("new-author-fields");
+
+    function toggleAuthorFields() {
+        const isNew = authorMode.value === "new";
+
+        existingAuthorField.hidden = isNew;
+        newAuthorFields.hidden = !isNew;
+
+        document.getElementById("author_id").required = !isNew;
+        document.getElementById("author_name").required = isNew;
+    }
+
+    authorMode.addEventListener("change", toggleAuthorFields);
+
+    toggleAuthorFields();
+</script>
+{% endblock %}

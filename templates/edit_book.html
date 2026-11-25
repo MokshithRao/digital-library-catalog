@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Book | Digital Library Catalog{% endblock %}
+
+{% block content %}
+<section aria-labelledby="edit-book-title">
+    <p class="eyebrow">Catalog administration</p>
+    <h1 id="edit-book-title">Edit Book</h1>
+
+    <form action="/books/{{ book.id }}/edit" method="POST" enctype="multipart/form-data">
+
+        <div class="field">
+            <label for="title">Book Title</label>
+            <input type="text" id="title" name="title" value="{{ book.title }}" required>
+        </div>
+
+        <div class="field">
+            <label for="description">Description</label>
+            <textarea id="description" name="description">{{ book.description or '' }}</textarea>
+        </div>
+
+        <div class="field">
+            <label for="isbn">ISBN</label>
+            <input type="text" id="isbn" name="isbn" value="{{ book.isbn or '' }}">
+        </div>
+
+        <div class="field">
+            <label for="publisher">Publisher</label>
+            <input type="text" id="publisher" name="publisher" value="{{ book.publisher or '' }}">
+        </div>
+
+        <div class="field">
+            <label for="publication_year">Publication Year</label>
+            <input type="number" id="publication_year" name="publication_year"
+                   value="{{ book.publication_year or '' }}">
+        </div>
+
+        <div class="field">
+            <label for="cover_image">Book Cover</label>
+            <input type="file" id="cover_image" name="cover_image" accept="image/*">
+            <p>Current cover:</p>
+            {% if book.cover_image %}
+                <img src="{{ url_for('static', path='/images/' + book.cover_image) }}"
+                     alt="Cover of {{ book.title }}" width="120">
+            {% endif %}
+        </div>
+
+        <div class="field">
+            <label for="genre_id">Genre</label>
+            <select id="genre_id" name="genre_id" required>
+                {% for genre in genres %}
+                    <option value="{{ genre.id }}"
+                        {% if genre.id == book.genre_id %}selected{% endif %}>
+                        {{ genre.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="author_id">Author</label>
+            <select id="author_id" name="author_id" required>
+                {% for author in authors %}
+                    <option value="{{ author.id }}"
+                        {% if author.id == book.author_id %}selected{% endif %}>
+                        {{ author.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="is_available">Availability</label>
+            <select id="is_available" name="is_available">
+                <option value="true" {% if book.is_available %}selected{% endif %}>
+                    Available
+                </option>
+                <option value="false" {% if not book.is_available %}selected{% endif %}>
+                    Unavailable
+                </option>
+            </select>
+        </div>
+
+        <button type="submit">Save Changes</button>
+    </form>
+</section>
+{% endblock %}
